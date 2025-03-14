@@ -1,6 +1,6 @@
 # STUDENT MANAGEMENT
 
-Đây là một ứng dụng bao gồm cả backend và frontend, được xây dựng để phục vụ [mô tả ngắn gọn về mục đích của dự án, ví dụ: "quản lý dữ liệu người dùng" hoặc "ứng dụng web thương mại điện tử"].
+Đây là một ứng dụng bao gồm cả backend và frontend, được xây dựng để phục vụ mục đích quản lý sinh viên đơn giản.
 
 ## Cấu trúc source code
 
