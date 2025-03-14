@@ -16,19 +16,52 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
         status: ''
     });
 
+    const [errors, setErrors] = useState({}); // State để lưu thông báo lỗi
+
     useEffect(() => {
         if (selectedStudent) {
             setStudent(selectedStudent);
         }
     }, [selectedStudent]);
 
+    // Hàm kiểm tra tính hợp lệ
+    const validateForm = () => {
+        const newErrors = {};
+
+        // Kiểm tra email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!student.email || !emailRegex.test(student.email)) {
+            newErrors.email = 'Email không hợp lệ';
+        }
+
+        // Kiểm tra số điện thoại
+        const phoneRegex = /^0\d{9}$/;
+        if (!student.phone || !phoneRegex.test(student.phone)) {
+            newErrors.phone = 'Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0; // Trả về true nếu không có lỗi
+    };
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setStudent({ ...student, [name]: value });
+
+        // Xóa thông báo lỗi khi người dùng nhập lại
+        if (errors[name]) {
+            setErrors({ ...errors, [name]: '' });
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        // Kiểm tra tính hợp lệ trước khi gửi dữ liệu
+        if (!validateForm()) {
+            return; // Dừng lại nếu có lỗi
+        }
+
         try {
             if (selectedStudent) {
                 await axios.put(`http://localhost:5000/api/students/${student.mssv}`, student);
@@ -50,6 +83,7 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                 phone: '',
                 status: ''
             });
+            setErrors({}); // Xóa thông báo lỗi sau khi gửi thành công
         } catch (error) {
             console.error('Error saving student:', error);
         }
@@ -173,25 +207,27 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                                 <label className="form-label">Email</label>
                                 <input
                                     type="email"
-                                    className="form-control"
+                                    className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                                     name="email"
                                     placeholder="Email"
                                     value={student.email}
                                     onChange={handleChange}
                                     required
                                 />
+                                {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                             </div>
                             <div className="mb-3">
                                 <label className="form-label">Số điện thoại</label>
                                 <input
                                     type="tel"
-                                    className="form-control"
+                                    className={`form-control ${errors.phone ? 'is-invalid' : ''}`}
                                     name="phone"
                                     placeholder="Số điện thoại"
                                     value={student.phone}
                                     onChange={handleChange}
                                     required
                                 />
+                                {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
                             </div>
                             <div className="mb-3">
                                 <label className="form-label">Tình trạng</label>

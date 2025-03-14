@@ -35,10 +35,9 @@ Dự án được tổ chức thành hai thư mục chính:
 
 ### Các bước cài đặt
 1.  **Clone Repository:**
-
+    Tạo một thư mục để chứa code, sau đó sử dụng cmd để chạy lệnh sau:
     ```bash
     git clone https://github.com/Thien19012004/TTT-Ex-TKPM.git
-    cd Tke phan mem
     ```
 
 2.  **Cài Đặt Dependencies cho backend:**
