@@ -1,0 +1,68 @@
+# STUDENT MANAGEMENT
+
+Đây là một ứng dụng bao gồm cả backend và frontend, được xây dựng để phục vụ [mô tả ngắn gọn về mục đích của dự án, ví dụ: "quản lý dữ liệu người dùng" hoặc "ứng dụng web thương mại điện tử"].
+
+## Cấu trúc source code
+
+Dự án được tổ chức thành hai thư mục chính:
+
+├── backend/                  # Thư mục chứa mã nguồn backend
+│   ├── package.json          # File cấu hình dependencies cho backend
+│   ├── server.js             # File chính để khởi chạy server backend
+│   └── routes/               # Thư mục chứa các route API
+│       └── studentRoutes.js  # Route quản lý sinh viên
+│
+├── frontend/                 # Thư mục chứa mã nguồn frontend
+│   ├── public/               # Thư mục chứa các file tĩnh (HTML, CSS, JS)
+│   ├── src/                  # Thư mục chứa mã nguồn React
+│   │   ├── components/       # Thư mục chứa các components
+│   │   │   ├── StudentForm.js
+│   │   │   ├── StudentList.js
+│   │   │   └── StudentSearch.js
+│   │   ├── App.js            # Component chính của ứng dụng
+│   │   ├── index.js          # File khởi chạy ứng dụng React
+│   │   └── db.js             # File quản lý IndexedDB
+│   ├── package.json          # File cấu hình dependencies cho frontend
+│   └── .env                  # File cấu hình biến môi trường (nếu có)
+│
+└── README.md                 # File hướng dẫn dự án
+
+## Hướng dẫn cài đặt & chạy chương trình
+
+### Yêu cầu
+- Node.js và npm đã được cài đặt trên máy của bạn.
+- Một trình quản lý gói (như npm hoặc yarn).
+
+### Các bước cài đặt
+1.  **Clone Repository:**
+
+    ```bash
+    git clone https://github.com/Thien19012004/TTT-Ex-TKPM.git
+    cd Tke phan mem
+    ```
+
+2.  **Cài Đặt Dependencies cho backend:**
+
+    ```bash
+    cd backend
+    npm install
+    ```
+3. **Cài đặt Dependencies cho frontend:**
+    ```bash
+    cd ../frontend
+    npm install
+    ```
+
+### Chạy ứng dụng.
+1.  **Chạy backend:**
+    ```bash
+    node server.js
+    ```
+2. **Chạy frontend:**
+    ```bash
+    npm start
+    ```
+
+Ứng dụng sẽ chạy tại `http://localhost:3000` 
+Server sẽ chạy tại `http://localhost:5000`
+
