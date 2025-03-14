@@ -9,11 +9,11 @@ Dự án được tổ chức thành hai thư mục chính:
 ├── backend/                  # Thư mục chứa mã nguồn backend
 │   ├── package.json          # File cấu hình dependencies cho backend
 │   ├── server.js             # File chính để khởi chạy server backend
-│   └── routes/               # Thư mục chứa các route API
-│       └── studentRoutes.js  # Route quản lý sinh viên
+│   
+│     
 │
 ├── frontend/                 # Thư mục chứa mã nguồn frontend
-│   ├── public/               # Thư mục chứa các file tĩnh (HTML, CSS, JS)
+│   ├── public/              
 │   ├── src/                  # Thư mục chứa mã nguồn React
 │   │   ├── components/       # Thư mục chứa các components
 │   │   │   ├── StudentForm.js
@@ -23,7 +23,7 @@ Dự án được tổ chức thành hai thư mục chính:
 │   │   ├── index.js          # File khởi chạy ứng dụng React
 │   │   └── db.js             # File quản lý IndexedDB
 │   ├── package.json          # File cấu hình dependencies cho frontend
-│   └── .env                  # File cấu hình biến môi trường (nếu có)
+│   └── package-lock.json     # File chi tiết các dependencies
 │
 └── README.md                 # File hướng dẫn dự án
 ```
