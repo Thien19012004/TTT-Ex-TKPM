@@ -5,7 +5,7 @@
 ## Cấu trúc source code
 
 Dự án được tổ chức thành hai thư mục chính:
-
+```bash
 ├── backend/                  # Thư mục chứa mã nguồn backend
 │   ├── package.json          # File cấu hình dependencies cho backend
 │   ├── server.js             # File chính để khởi chạy server backend
@@ -26,7 +26,7 @@ Dự án được tổ chức thành hai thư mục chính:
 │   └── .env                  # File cấu hình biến môi trường (nếu có)
 │
 └── README.md                 # File hướng dẫn dự án
-
+```
 ## Hướng dẫn cài đặt & chạy chương trình
 
 ### Yêu cầu
