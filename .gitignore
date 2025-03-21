@@ -1,3 +1,4 @@
 # Bỏ qua thư mục node_modules trong cả hai thư mục con
 /frontend/node_modules
 /backend/node_modules
+/backend/.env

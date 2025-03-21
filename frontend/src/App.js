@@ -3,10 +3,13 @@ import axios from 'axios';
 import StudentForm from './components/StudentForm';
 import StudentList from './components/StudentList';
 import StudentSearch from './components/StudentSearch';
+import Sidebar from './components/Sidebar';
+import { Button, Container } from 'react-bootstrap';
 
 const App = () => {
     const [students, setStudents] = useState([]);
     const [selectedStudent, setSelectedStudent] = useState(null);
+    const [showSidebar, setShowSidebar] = useState(false);
 
     // Fetch danh sách sinh viên khi component được mount
     useEffect(() => {
@@ -60,8 +63,12 @@ const App = () => {
     };
 
     return (
-        <div className="container mt-4">
+        <Container fluid className="mt-4">
             <h1 className="text-center mb-4">Quản lý sinh viên</h1>
+            <Button variant="primary" onClick={() => setShowSidebar(true)}>
+                Mở Sidebar
+            </Button>
+            <Sidebar show={showSidebar} handleClose={() => setShowSidebar(false)} />
             <StudentForm
                 onAddStudent={handleAddStudent}
                 onUpdateStudent={handleUpdateStudent}
@@ -73,7 +80,7 @@ const App = () => {
                 onDelete={handleDeleteStudent}
                 onEdit={setSelectedStudent}
             />
-        </div>
+        </Container>
     );
 };
 

@@ -31,10 +31,32 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
 
     const [errors, setErrors] = useState({}); // State để lưu thông báo lỗi
 
+    const [faculties, setFaculties] = useState([]);
+    const [programs, setPrograms] = useState([]);
+    const [statuses, setStatuses] = useState([]);
+
     useEffect(() => {
         if (selectedStudent) {
             setStudent(selectedStudent);
         }
+
+        const fetchData = async () => {
+            try {
+                const [facultiesRes, programsRes, statusesRes] = await Promise.all([
+                    axios.get("http://localhost:5000/api/faculties"),
+                    axios.get("http://localhost:5000/api/programs"),
+                    axios.get("http://localhost:5000/api/statuses"),
+                ]);
+
+                setFaculties(facultiesRes.data);
+                setPrograms(programsRes.data);
+                setStatuses(statusesRes.data);
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu:", error);
+            }
+        };
+
+        fetchData();
     }, [selectedStudent]);
 
     // Hàm kiểm tra tính hợp lệ
@@ -59,13 +81,26 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setStudent({ ...student, [name]: value });
-
+    
+        // Nếu chọn từ danh sách (faculty, status, program), tìm _id tương ứng
+        let selectedId = value;
+    
+        if (name === "faculty") {
+            selectedId = faculties.find(f => f._id === value)?._id || value;
+        } else if (name === "status") {
+            selectedId = statuses.find(s => s._id === value)?._id || value;
+        } else if (name === "program") {
+            selectedId = programs.find(p => p._id === value)?._id || value;
+        }
+    
+        setStudent({ ...student, [name]: selectedId });
+    
         // Xóa thông báo lỗi khi người dùng nhập lại
         if (errors[name]) {
-            setErrors({ ...errors, [name]: '' });
+            setErrors({ ...errors, [name]: "" });
         }
     };
+    
 
     const handleAddressChange = (type, field, value) => {
         setStudent({
@@ -201,7 +236,7 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                                     <option value="Nữ">Nữ</option>
                                 </select>
                             </div>
-                            <div className="mb-3">
+                           <div className="mb-3">
                                 <label className="form-label">Khoa</label>
                                 <select
                                     className="form-select"
@@ -211,10 +246,11 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                                     required
                                 >
                                     <option value="">Chọn khoa</option>
-                                    <option value="Khoa Luật">Khoa Luật</option>
-                                    <option value="Khoa Tiếng Anh thương mại">Khoa Tiếng Anh thương mại</option>
-                                    <option value="Khoa Tiếng Nhật">Khoa Tiếng Nhật</option>
-                                    <option value="Khoa Tiếng Pháp">Khoa Tiếng Pháp</option>
+                                    {faculties.map((faculty) => (
+                                        <option key={faculty._id} value={faculty._id}>
+                                            {faculty.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 
@@ -233,15 +269,20 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
 
                             <div className="mb-3">
                                 <label className="form-label">Chương trình</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
+                                <select
+                                    className="form-select"
                                     name="program"
-                                    placeholder="Chương trình"
                                     value={student.program}
                                     onChange={handleChange}
                                     required
-                                />
+                                >
+                                    <option value="">Chọn chương trình</option>
+                                    {programs.map((program) => (
+                                        <option key={program._id} value={program._id}>
+                                            {program.name}
+                                        </option>
+                                    ))}
+                                </select>
                             </div>
 
                             <div className="mb-3">
@@ -470,7 +511,7 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                                 {errors.phone && <div className="invalid-feedback">{errors.phone}</div>}
                             </div>
                             <div className="mb-3">
-                                <label className="form-label">Tình trạng</label>
+                                <label className="form-label">Trạng thái</label>
                                 <select
                                     className="form-select"
                                     name="status"
@@ -478,11 +519,12 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                                     onChange={handleChange}
                                     required
                                 >
-                                    <option value="">Chọn tình trạng</option>
-                                    <option value="Đang học">Đang học</option>
-                                    <option value="Đã tốt nghiệp">Đã tốt nghiệp</option>
-                                    <option value="Đã thôi học">Đã thôi học</option>
-                                    <option value="Tạm dừng học">Tạm dừng học</option>
+                                    <option value="">Chọn trạng thái</option>
+                                    {statuses.map((status) => (
+                                        <option key={status._id} value={status._id}>
+                                            {status.name}
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
                         </div>

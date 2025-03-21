@@ -39,7 +39,7 @@ const StudentSearch = ({ onSearch }) => {
                         >
                             <option value="">Tất cả khoa</option>
                             {faculties.map((faculty) => (
-                                <option key={faculty._id} value={faculty.name}>
+                                <option key={faculty._id} value={faculty._id}>
                                     {faculty.name}
                                 </option>
                             ))}

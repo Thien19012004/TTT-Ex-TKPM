@@ -1,6 +1,6 @@
 // controllers/facultyController.js
 const Faculty = require('../models/facultyModel');
-
+const Student = require('../models/studentModel');
 // Lấy danh sách khoa
 const getFaculties = async (req, res) => {
     try {
@@ -38,15 +38,27 @@ const updateFaculty = async (req, res) => {
 // Xóa khoa
 const deleteFaculty = async (req, res) => {
     try {
-        const faculty = await Faculty.findByIdAndDelete(req.params.id);
+        const id = req.params.id; // Lấy ID từ request params
+        console.log(id);
+        // Kiểm tra xem có sinh viên nào thuộc khoa này không
+        const existingStudents = await Student.findOne({ faculty: id });
+
+        if (existingStudents) {
+            return res.status(400).json({ message: "Không thể xóa vì có sinh viên đang thuộc khoa này!" });
+        }
+
+        // Xóa khoa nếu không có sinh viên thuộc khoa đó
+        const faculty = await Faculty.findByIdAndDelete(id);
         if (!faculty) {
             return res.status(404).json({ message: 'Faculty not found' });
         }
-        res.status(204).send();
+        
+        res.status(204).send(); // Thành công, không có nội dung trả về
     } catch (err) {
         res.status(500).json({ message: err.message });
     }
 };
+
 
 module.exports = {
     getFaculties,
