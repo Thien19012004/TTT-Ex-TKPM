@@ -1,3 +1,4 @@
+const logger = require('../log/logger');
 const Student = require('../models/studentModel');
 
 // Lấy danh sách sinh viên
@@ -10,6 +11,7 @@ const getStudents = async (req, res) => {
         }));
         res.json(formattedStudents);
     } catch (err) {
+        logger.error({ message: `Error: ${err}` });
         res.status(500).json({ message: err.message });
     }
 };
@@ -19,8 +21,10 @@ const addStudent = async (req, res) => {
     try {
         const student = new Student(req.body);
         await student.save();
+        logger.info({ message: `Student: ${req.body.mssv} add successfully` });
         res.status(201).json(student);
     } catch (err) {
+        logger.error({ message: `Error: ${err}` });
         res.status(400).json({ message: err.message });
     }
 };
@@ -32,8 +36,10 @@ const updateStudent = async (req, res) => {
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
+        logger.info({ message: `Student: ${req.params.mssv} updated successfully` });
         res.json(student);
     } catch (err) {
+        logger.error({ message: `Error: ${err}` });
         res.status(400).json({ message: err.message });
     }
 };
@@ -45,8 +51,10 @@ const deleteStudent = async (req, res) => {
         if (!student) {
             return res.status(404).json({ message: 'Student not found' });
         }
+        logger.info({ message: `Student: ${req.params.mssv} deleted successfully` });
         res.status(204).send();
     } catch (err) {
+        logger.error({ message: `Error: ${err}` });
         res.status(500).json({ message: err.message });
     }
 };
