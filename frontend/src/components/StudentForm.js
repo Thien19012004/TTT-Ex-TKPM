@@ -10,7 +10,20 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
         faculty: '',
         course: '',
         program: '',
-        address: '',
+        permanentAddress: { street: '', ward: '', district: '', city: '', country: '' },
+        temporaryAddress: { street: '', ward: '', district: '', city: '', country: '' },
+        mailingAddress: { street: '', ward: '', district: '', city: '', country: '' },
+        identityDocument: {
+            type: 'CMND',
+            number: '',
+            issueDate: '',
+            issuePlace: '',
+            expiryDate: '',
+            hasChip: false,
+            issueCountry: '',
+            notes: ''
+        },
+        nationality: '',
         email: '',
         phone: '',
         status: ''
@@ -54,6 +67,20 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
         }
     };
 
+    const handleAddressChange = (type, field, value) => {
+        setStudent({
+            ...student,
+            [type]: { ...student[type], [field]: value }
+        });
+    };
+
+    const handleIdentityDocumentChange = (field, value) => {
+        setStudent({
+            ...student,
+            identityDocument: { ...student.identityDocument, [field]: value }
+        });
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -78,7 +105,20 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                 faculty: '',
                 course: '',
                 program: '',
-                address: '',
+                permanentAddress: { street: '', ward: '', district: '', city: '', country: '' },
+                temporaryAddress: { street: '', ward: '', district: '', city: '', country: '' },
+                mailingAddress: { street: '', ward: '', district: '', city: '', country: '' },
+                identityDocument: {
+                    type: 'CMND',
+                    number: '',
+                    issueDate: '',
+                    issuePlace: '',
+                    expiryDate: '',
+                    hasChip: false,
+                    issueCountry: '',
+                    notes: ''
+                },
+                nationality: '',
                 email: '',
                 phone: '',
                 status: ''
@@ -121,6 +161,20 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                                     required
                                 />
                             </div>
+
+                            <div className="mb-3">
+                                <label className="form-label">Quốc tịch</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="nationality"
+                                    placeholder="Quốc tịch"
+                                    value={student.nationality}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+
                             <div className="mb-3">
                                 <label className="form-label">Ngày sinh</label>
                                 <input
@@ -163,10 +217,7 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                                     <option value="Khoa Tiếng Pháp">Khoa Tiếng Pháp</option>
                                 </select>
                             </div>
-                        </div>
 
-                        {/* Cột 2 */}
-                        <div className="col-md-6">
                             <div className="mb-3">
                                 <label className="form-label">Khóa</label>
                                 <input
@@ -179,6 +230,7 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                                     required
                                 />
                             </div>
+
                             <div className="mb-3">
                                 <label className="form-label">Chương trình</label>
                                 <input
@@ -191,18 +243,206 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                                     required
                                 />
                             </div>
+
                             <div className="mb-3">
-                                <label className="form-label">Địa chỉ</label>
+                                <label className="form-label">Địa chỉ thường trú</label>
                                 <input
                                     type="text"
-                                    className="form-control"
-                                    name="address"
-                                    placeholder="Địa chỉ"
-                                    value={student.address}
-                                    onChange={handleChange}
-                                    required
+                                    className="form-control mb-2"
+                                    placeholder="Số nhà, Tên đường"
+                                    value={student.permanentAddress.street}
+                                    onChange={(e) => handleAddressChange('permanentAddress', 'street', e.target.value)}
+                                />
+                                <input
+                                    type="text"
+                                    className="form-control mb-2"
+                                    placeholder="Phường/Xã"
+                                    value={student.permanentAddress.ward}
+                                    onChange={(e) => handleAddressChange('permanentAddress', 'ward', e.target.value)}
+                                />
+                                <input
+                                    type="text"
+                                    className="form-control mb-2"
+                                    placeholder="Quận/Huyện"
+                                    value={student.permanentAddress.district}
+                                    onChange={(e) => handleAddressChange('permanentAddress', 'district', e.target.value)}
+                                />
+                                <input
+                                    type="text"
+                                    className="form-control mb-2"
+                                    placeholder="Tỉnh/Thành phố"
+                                    value={student.permanentAddress.city}
+                                    onChange={(e) => handleAddressChange('permanentAddress', 'city', e.target.value)}
+                                />
+                                <input
+                                    type="text"
+                                    className="form-control mb-2"
+                                    placeholder="Quốc gia"
+                                    value={student.permanentAddress.country}
+                                    onChange={(e) => handleAddressChange('permanentAddress', 'country', e.target.value)}
                                 />
                             </div>
+                        </div>
+
+                        {/* Cột 2 */}
+                        <div className="col-md-6">
+                            {/* Địa chỉ tạm trú */}
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <h6>Địa chỉ tạm trú</h6>
+                                    <input
+                                        type="text"
+                                        className="form-control mb-2"
+                                        placeholder="Số nhà, Tên đường"
+                                        value={student.temporaryAddress.street}
+                                        onChange={(e) => handleAddressChange('temporaryAddress', 'street', e.target.value)}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="form-control mb-2"
+                                        placeholder="Phường/Xã"
+                                        value={student.temporaryAddress.ward}
+                                        onChange={(e) => handleAddressChange('temporaryAddress', 'ward', e.target.value)}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="form-control mb-2"
+                                        placeholder="Quận/Huyện"
+                                        value={student.temporaryAddress.district}
+                                        onChange={(e) => handleAddressChange('temporaryAddress', 'district', e.target.value)}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="form-control mb-2"
+                                        placeholder="Tỉnh/Thành phố"
+                                        value={student.temporaryAddress.city}
+                                        onChange={(e) => handleAddressChange('temporaryAddress', 'city', e.target.value)}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="form-control mb-2"
+                                        placeholder="Quốc gia"
+                                        value={student.temporaryAddress.country}
+                                        onChange={(e) => handleAddressChange('temporaryAddress', 'country', e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Địa chỉ nhận thư */}
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <h6>Địa chỉ nhận thư</h6>
+                                    <input
+                                        type="text"
+                                        className="form-control mb-2"
+                                        placeholder="Số nhà, Tên đường"
+                                        value={student.mailingAddress.street}
+                                        onChange={(e) => handleAddressChange('mailingAddress', 'street', e.target.value)}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="form-control mb-2"
+                                        placeholder="Phường/Xã"
+                                        value={student.mailingAddress.ward}
+                                        onChange={(e) => handleAddressChange('mailingAddress', 'ward', e.target.value)}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="form-control mb-2"
+                                        placeholder="Quận/Huyện"
+                                        value={student.mailingAddress.district}
+                                        onChange={(e) => handleAddressChange('mailingAddress', 'district', e.target.value)}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="form-control mb-2"
+                                        placeholder="Tỉnh/Thành phố"
+                                        value={student.mailingAddress.city}
+                                        onChange={(e) => handleAddressChange('mailingAddress', 'city', e.target.value)}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="form-control mb-2"
+                                        placeholder="Quốc gia"
+                                        value={student.mailingAddress.country}
+                                        onChange={(e) => handleAddressChange('mailingAddress', 'country', e.target.value)}
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Giấy tờ chứng minh nhân thân */}
+                            <div className="row">
+                                <div className="col-md-6">
+                                    <h6>Giấy tờ chứng minh nhân thân</h6>
+                                    <select
+                                        className="form-control mb-2"
+                                        value={student.identityDocument.type}
+                                        onChange={(e) => handleIdentityDocumentChange('type', e.target.value)}
+                                    >
+                                        <option value="CMND">Chứng minh nhân dân (CMND)</option>
+                                        <option value="CCCD">Căn cước công dân (CCCD)</option>
+                                        <option value="Passport">Hộ chiếu (Passport)</option>
+                                    </select>
+                                    <input
+                                        type="text"
+                                        className="form-control mb-2"
+                                        placeholder="Số CMND/CCCD/Hộ chiếu"
+                                        value={student.identityDocument.number}
+                                        onChange={(e) => handleIdentityDocumentChange('number', e.target.value)}
+                                    />
+                                    <input
+                                        type="date"
+                                        className="form-control mb-2"
+                                        placeholder="Ngày cấp"
+                                        value={student.identityDocument.issueDate}
+                                        onChange={(e) => handleIdentityDocumentChange('issueDate', e.target.value)}
+                                    />
+                                    <input
+                                        type="text"
+                                        className="form-control mb-2"
+                                        placeholder="Nơi cấp"
+                                        value={student.identityDocument.issuePlace}
+                                        onChange={(e) => handleIdentityDocumentChange('issuePlace', e.target.value)}
+                                    />
+                                    <input
+                                        type="date"
+                                        className="form-control mb-2"
+                                        placeholder="Ngày hết hạn"
+                                        value={student.identityDocument.expiryDate}
+                                        onChange={(e) => handleIdentityDocumentChange('expiryDate', e.target.value)}
+                                    />
+                                    {student.identityDocument.type === 'CCCD' && (
+                                        <div className="form-check mb-2">
+                                            <input
+                                                type="checkbox"
+                                                className="form-check-input"
+                                                checked={student.identityDocument.hasChip}
+                                                onChange={(e) => handleIdentityDocumentChange('hasChip', e.target.checked)}
+                                            />
+                                            <label className="form-check-label">Có gắn chip</label>
+                                        </div>
+                                    )}
+                                    {student.identityDocument.type === 'Passport' && (
+                                        <>
+                                            <input
+                                                type="text"
+                                                className="form-control mb-2"
+                                                placeholder="Quốc gia cấp"
+                                                value={student.identityDocument.issueCountry}
+                                                onChange={(e) => handleIdentityDocumentChange('issueCountry', e.target.value)}
+                                            />
+                                            <input
+                                                type="text"
+                                                className="form-control mb-2"
+                                                placeholder="Ghi chú"
+                                                value={student.identityDocument.notes}
+                                                onChange={(e) => handleIdentityDocumentChange('notes', e.target.value)}
+                                            />
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+
                             <div className="mb-3">
                                 <label className="form-label">Email</label>
                                 <input

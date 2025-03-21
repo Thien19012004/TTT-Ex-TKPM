@@ -45,9 +45,14 @@ const App = () => {
     };
 
     // Hàm xử lý tìm kiếm sinh viên
-    const handleSearch = async (query) => {
+    const handleSearch = async (query, faculty) => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/students/search?q=${query}`);
+            const response = await axios.get('http://localhost:5000/api/students/search', {
+                params: {
+                    q: query, // Từ khóa tìm kiếm (tên hoặc MSSV)
+                    faculty: faculty // Khoa được chọn
+                }
+            });
             setStudents(response.data); // Cập nhật danh sách sinh viên với kết quả tìm kiếm
         } catch (error) {
             console.error('Error searching students:', error);

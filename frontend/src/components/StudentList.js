@@ -1,5 +1,4 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import React from 'react';
 
 const StudentList = ({ students, onDelete, onEdit }) => {
     return (
@@ -16,7 +15,11 @@ const StudentList = ({ students, onDelete, onEdit }) => {
                             <th>Khoa</th>
                             <th>Khóa</th>
                             <th>Chương trình</th>
-                            <th>Địa chỉ</th>
+                            <th>Địa chỉ thường trú</th>
+                            <th>Địa chỉ tạm trú</th>
+                            <th>Địa chỉ nhận thư</th>
+                            <th>Giấy tờ CMND/CCCD/Passport</th>
+                            <th>Quốc tịch</th>
                             <th>Email</th>
                             <th>Số điện thoại</th>
                             <th>Tình trạng</th>
@@ -28,12 +31,30 @@ const StudentList = ({ students, onDelete, onEdit }) => {
                             <tr key={student.mssv}>
                                 <td>{student.mssv}</td>
                                 <td>{student.name}</td>
-                                <td>{student.dob}</td>
+                                <td>{new Date(student.dob).toLocaleDateString()}</td> {/* Định dạng ngày tháng */}
                                 <td>{student.gender}</td>
                                 <td>{student.faculty}</td>
                                 <td>{student.course}</td>
                                 <td>{student.program}</td>
-                                <td>{student.address}</td>
+                                <td>
+                                    {student.permanentAddress.street}, {student.permanentAddress.ward}, {student.permanentAddress.district}, {student.permanentAddress.city}, {student.permanentAddress.country}
+                                </td>
+                                <td>
+                                    {student.temporaryAddress.street}, {student.temporaryAddress.ward}, {student.temporaryAddress.district}, {student.temporaryAddress.city}, {student.temporaryAddress.country}
+                                </td>
+                                <td>
+                                    {student.mailingAddress.street}, {student.mailingAddress.ward}, {student.mailingAddress.district}, {student.mailingAddress.city}, {student.mailingAddress.country}
+                                </td>
+                                <td>
+                                    {student.identityDocument.type}: {student.identityDocument.number}<br />
+                                    Ngày cấp: {new Date(student.identityDocument.issueDate).toLocaleDateString()}<br />
+                                    Nơi cấp: {student.identityDocument.issuePlace}<br />
+                                    {student.identityDocument.expiryDate && `Ngày hết hạn: ${new Date(student.identityDocument.expiryDate).toLocaleDateString()}`}<br />
+                                    {student.identityDocument.type === 'CCCD' && `Có gắn chip: ${student.identityDocument.hasChip ? 'Có' : 'Không'}`}<br />
+                                    {student.identityDocument.type === 'Passport' && `Quốc gia cấp: ${student.identityDocument.issueCountry}`}<br />
+                                    {student.identityDocument.type === 'Passport' && `Ghi chú: ${student.identityDocument.notes}`}
+                                </td>
+                                <td>{student.nationality}</td>
                                 <td>{student.email}</td>
                                 <td>{student.phone}</td>
                                 <td>{student.status}</td>
