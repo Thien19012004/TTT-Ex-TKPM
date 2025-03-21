@@ -10,7 +10,7 @@ const StudentSearch = ({ onSearch }) => {
     useEffect(() => {
         const fetchFaculties = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/api/faculties'); // Gọi API lấy danh sách khoa
+                const response = await axios.get('http://localhost:5002/api/faculties'); // Gọi API lấy danh sách khoa
                 setFaculties(response.data);
             } catch (error) {
                 console.error('Error fetching faculties:', error);

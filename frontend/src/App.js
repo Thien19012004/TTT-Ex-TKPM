@@ -16,7 +16,7 @@ const App = () => {
     // Hàm fetch danh sách sinh viên từ backend
     const fetchStudents = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/students');
+            const response = await axios.get('http://localhost:5002/api/students');
             setStudents(response.data);
         } catch (error) {
             console.error('Error fetching students:', error);
@@ -37,7 +37,7 @@ const App = () => {
     // Hàm xử lý xóa sinh viên
     const handleDeleteStudent = async (mssv) => {
         try {
-            await axios.delete(`http://localhost:5000/api/students/${mssv}`);
+            await axios.delete(`http://localhost:5002/api/students/${mssv}`);
             setStudents(students.filter(student => student.mssv !== mssv));
         } catch (error) {
             console.error('Error deleting student:', error);
@@ -47,7 +47,7 @@ const App = () => {
     // Hàm xử lý tìm kiếm sinh viên
     const handleSearch = async (query, faculty) => {
         try {
-            const response = await axios.get('http://localhost:5000/api/students/search', {
+            const response = await axios.get('http://localhost:5002/api/students/search', {
                 params: {
                     q: query, // Từ khóa tìm kiếm (tên hoặc MSSV)
                     faculty: faculty // Khoa được chọn

@@ -91,10 +91,10 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
 
         try {
             if (selectedStudent) {
-                await axios.put(`http://localhost:5000/api/students/${student.mssv}`, student);
+                await axios.put(`http://localhost:5002/api/students/${student.mssv}`, student);
                 onUpdateStudent(student);
             } else {
-                await axios.post('http://localhost:5000/api/students', student);
+                await axios.post('http://localhost:5002/api/students', student);
                 onAddStudent(student);
             }
             setStudent({
