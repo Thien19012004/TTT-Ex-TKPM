@@ -1,10 +1,32 @@
+import { useState } from 'react';
 import React from 'react';
 
-const StudentList = ({ students, onDelete, onEdit }) => {
+const StudentList = ({ students, onDelete, onEdit, onImport, onExport }) => {
+    const [exportFormat, setExportFormat] = useState('csv'); // Mặc định là CSV
+
+    const handleExportClick = () => {
+        onExport(students, exportFormat); // Truyền định dạng vào hàm onExport
+    };
+
     return (
         <div className="card">
             <div className="card-body">
-                <h5 className="card-title">Danh sách sinh viên</h5>
+                <div className="d-flex justify-content-between align-items-center mb-3">
+                    <h5 className="card-title">Danh sách sinh viên</h5>
+                    <div className="d-flex align-items-center">
+                        <select
+                            className="form-select me-2"
+                            value={exportFormat}
+                            onChange={(e) => setExportFormat(e.target.value)}
+                            style={{ width: 'auto' }}
+                        >
+                            <option value="csv">CSV</option>
+                            <option value="excel">Excel</option>
+                        </select>
+                        <button className="btn btn-primary me-2" onClick={onImport}>Import File</button>
+                        <button className="btn btn-success" onClick={handleExportClick}>Export File</button>
+                    </div>
+                </div>
                 <table className="table table-striped">
                     <thead>
                         <tr>
@@ -31,7 +53,7 @@ const StudentList = ({ students, onDelete, onEdit }) => {
                             <tr key={student.mssv}>
                                 <td>{student.mssv}</td>
                                 <td>{student.name}</td>
-                                <td>{new Date(student.dob).toLocaleDateString()}</td> {/* Định dạng ngày tháng */}
+                                <td>{new Date(student.dob).toLocaleDateString()}</td>
                                 <td>{student.gender}</td>
                                 <td>{student.faculty}</td>
                                 <td>{student.course}</td>
@@ -80,5 +102,6 @@ const StudentList = ({ students, onDelete, onEdit }) => {
         </div>
     );
 };
+
 
 export default StudentList;
