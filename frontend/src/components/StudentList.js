@@ -1,29 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import React from 'react';
 import axios from 'axios';
 const StudentList = ({ students, onDelete, onEdit, onImport, onExport }) => {
     const [exportFormat, setExportFormat] = useState('csv'); // Mặc định là CSV
-
-    const handleExportClick = () => {
-        onExport(students, exportFormat); // Truyền định dạng vào hàm onExport
-    };
-
-
     console.log("StudentList render - students:", students);
     const [faculties, setFaculties] = useState([]);
     const [statuses, setStatuses] = useState([]);
     const [programs, setPrograms] = useState([]);
 
+    const handleExportClick = () => {
+        onExport(students, exportFormat, faculties, statuses, programs); // Truyền định dạng vào hàm onExport
+    };
+
+
     useEffect(() => {
         const fetchData = async () => {
             try {
                 const [facultiesRes, programsRes, statusesRes] = await Promise.all([
-                    axios.get("http://localhost:5000/api/faculties"),
-                    axios.get("http://localhost:5000/api/programs"),
-                    axios.get("http://localhost:5000/api/statuses"),
+                    axios.get("http://localhost:5002/api/faculties"),
+                    axios.get("http://localhost:5002/api/programs"),
+                    axios.get("http://localhost:5002/api/statuses"),
                 ]);
 
-                console.log(facultiesRes);
+                //console.log(facultiesRes);
 
                 setFaculties(facultiesRes.data);
                 setStatuses(statusesRes.data);

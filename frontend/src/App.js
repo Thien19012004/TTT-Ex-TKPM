@@ -63,7 +63,10 @@ const App = () => {
         }
     };
 
-    const handleExport = (students, format) => {
+    const handleExport = (students, format, faculties, statuses, programs) => {
+        console.log(faculties);
+        console.log(statuses);
+        console.log(programs);
         if (students.length === 0) {
             alert("Không có dữ liệu để xuất.");
             return;
@@ -75,23 +78,35 @@ const App = () => {
             "Quốc tịch", "Email", "Số điện thoại", "Tình trạng"
         ];
     
-        const data = students.map(student => [
-            student.mssv,
-            student.name,
-            new Date(student.dob).toLocaleDateString(),
-            student.gender,
-            student.faculty,
-            student.course,
-            student.program,
-            `${student.permanentAddress.street}, ${student.permanentAddress.ward}, ${student.permanentAddress.district}, ${student.permanentAddress.city}, ${student.permanentAddress.country}`,
-            `${student.temporaryAddress.street}, ${student.temporaryAddress.ward}, ${student.temporaryAddress.district}, ${student.temporaryAddress.city}, ${student.temporaryAddress.country}`,
-            `${student.mailingAddress.street}, ${student.mailingAddress.ward}, ${student.mailingAddress.district}, ${student.mailingAddress.city}, ${student.mailingAddress.country}`,
-            `${student.identityDocument.type}: ${student.identityDocument.number}, Ngày cấp: ${new Date(student.identityDocument.issueDate).toLocaleDateString()}, Nơi cấp: ${student.identityDocument.issuePlace}`,
-            student.nationality,
-            student.email,
-            student.phone,
-            student.status
-        ]);
+        const data = students.map(student => {
+            const faculty = faculties.find(f => f._id === student.faculty);
+            const program = programs.find(p => p._id === student.program);
+            const status = statuses.find(s => s._id === student.status);
+    
+            console.log(`Student: ${student.name}, Faculty ID: ${student.faculty}, Mapped: ${faculty?.name}`);
+            console.log(`Program ID: ${student.program}, Mapped: ${program?.name}`);
+            console.log(`Status ID: ${student.status}, Mapped: ${status?.name}`);
+    
+            return [
+                student.mssv,
+                student.name,
+                new Date(student.dob).toLocaleDateString(),
+                student.gender,
+                faculty ? faculty.name : student.faculty, // Nếu faculty tìm thấy thì lấy name, nếu không giữ nguyên id
+                student.course,
+                program ? program.name : student.program,
+                `${student.permanentAddress.street}, ${student.permanentAddress.ward}, ${student.permanentAddress.district}, ${student.permanentAddress.city}, ${student.permanentAddress.country}`,
+                `${student.temporaryAddress.street}, ${student.temporaryAddress.ward}, ${student.temporaryAddress.district}, ${student.temporaryAddress.city}, ${student.temporaryAddress.country}`,
+                `${student.mailingAddress.street}, ${student.mailingAddress.ward}, ${student.mailingAddress.district}, ${student.mailingAddress.city}, ${student.mailingAddress.country}`,
+                `${student.identityDocument.type}: ${student.identityDocument.number}, Ngày cấp: ${new Date(student.identityDocument.issueDate).toLocaleDateString()}, Nơi cấp: ${student.identityDocument.issuePlace}`,
+                student.nationality,
+                student.email,
+                student.phone,
+                status ? status.name : student.status
+            ];
+        });
+
+        console.log(data);
     
         if (format === 'csv') {
             // Xuất file CSV

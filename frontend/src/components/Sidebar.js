@@ -20,7 +20,7 @@ const Sidebar = ({ show, handleClose }) => {
 
     const fetchFaculties = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/faculties');
+            const response = await axios.get('http://localhost:5002/api/faculties');
             setFaculties(response.data);
         } catch (error) {
             console.error('Error fetching faculties:', error);
@@ -34,7 +34,7 @@ const Sidebar = ({ show, handleClose }) => {
     // Xử lý xóa khoa
     const handleDeleteFaculty = async (id) => {
         try {
-            await axios.delete(`http://localhost:5000/api/faculties/${id}`);
+            await axios.delete(`http://localhost:5002/api/faculties/${id}`);
             fetchFaculties(); // Cập nhật lại danh sách khoa sau khi xóa
         } catch (error) {
             console.error('Error deleting faculty:', error);
@@ -45,7 +45,7 @@ const Sidebar = ({ show, handleClose }) => {
     // Xử lý cập nhật tên khoa
     const handleUpdateFaculty = async (id) => {
         try {
-            await axios.put(`http://localhost:5000/api/faculties/${id}`, { name: newFacultyName });
+            await axios.put(`http://localhost:5002/api/faculties/${id}`, { name: newFacultyName });
             setEditingFacultyId(null); // Tắt chế độ chỉnh sửa
             fetchFaculties(); // Cập nhật lại danh sách khoa sau khi sửa
         } catch (error) {
@@ -55,7 +55,7 @@ const Sidebar = ({ show, handleClose }) => {
 
     const handleAddFaculty = async () => {
         try {
-            const response = await axios.post('http://localhost:5000/api/faculties', { name: newFaculty });
+            const response = await axios.post('http://localhost:5002/api/faculties', { name: newFaculty });
             setFaculties([...faculties, response.data]); // Thêm khoa mới vào danh sách
             setNewFaculty(''); // Reset trường nhập liệu
         } catch (error) {
@@ -65,7 +65,7 @@ const Sidebar = ({ show, handleClose }) => {
 
     const fetchStatuses = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/statuses');
+            const response = await axios.get('http://localhost:5002/api/statuses');
             setStatuses(response.data);
         } catch (error) {
             console.error('Error fetching statuses:', error);
@@ -81,7 +81,7 @@ const Sidebar = ({ show, handleClose }) => {
      // Xử lý thêm, sửa, xóa statuses
     const handleAddStatus = async () => {
         try {
-            const response = await axios.post('http://localhost:5000/api/statuses', { name: newStatus });
+            const response = await axios.post('http://localhost:5002/api/statuses', { name: newStatus });
             setStatuses([...statuses, response.data]);
             setNewStatus('');
         } catch (error) {
@@ -91,7 +91,7 @@ const Sidebar = ({ show, handleClose }) => {
 
     const handleUpdateStatus = async (id) => {
         try {
-            await axios.put(`http://localhost:5000/api/statuses/${id}`, { name: newStatusName });
+            await axios.put(`http://localhost:5002/api/statuses/${id}`, { name: newStatusName });
             setEditingStatusId(null);
             fetchStatuses();
         } catch (error) {
@@ -101,7 +101,7 @@ const Sidebar = ({ show, handleClose }) => {
 
     const handleDeleteStatus = async (id) => {
         try {
-            await axios.delete(`http://localhost:5000/api/statuses/${id}`);
+            await axios.delete(`http://localhost:5002/api/statuses/${id}`);
             fetchStatuses();
         } catch (error) {
             console.error('Error deleting status:', error);
@@ -111,7 +111,7 @@ const Sidebar = ({ show, handleClose }) => {
             
     const fetchPrograms = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/programs');
+            const response = await axios.get('http://localhost:5002/api/programs');
             setPrograms(response.data);
         } catch (error) {
             console.error('Error fetching programs:', error);
@@ -127,7 +127,7 @@ const Sidebar = ({ show, handleClose }) => {
     // Xử lý thêm, sửa, xóa programs
     const handleAddProgram = async () => {
         try {
-            const response = await axios.post('http://localhost:5000/api/programs', { name: newProgram });
+            const response = await axios.post('http://localhost:5002/api/programs', { name: newProgram });
             setPrograms([...programs, response.data]);
             setNewProgram('');
         } catch (error) {
@@ -137,7 +137,7 @@ const Sidebar = ({ show, handleClose }) => {
 
     const handleUpdateProgram = async (id) => {
         try {
-            await axios.put(`http://localhost:5000/api/programs/${id}`, { name: newProgramName });
+            await axios.put(`http://localhost:5002/api/programs/${id}`, { name: newProgramName });
             setEditingProgramId(null);
             fetchPrograms();
         } catch (error) {
@@ -147,7 +147,7 @@ const Sidebar = ({ show, handleClose }) => {
 
     const handleDeleteProgram = async (id) => {
         try {
-            await axios.delete(`http://localhost:5000/api/programs/${id}`);
+            await axios.delete(`http://localhost:5002/api/programs/${id}`);
             fetchPrograms();
         } catch (error) {
             console.error('Error deleting program:', error);

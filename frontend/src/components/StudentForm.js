@@ -43,9 +43,9 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
         const fetchData = async () => {
             try {
                 const [facultiesRes, programsRes, statusesRes] = await Promise.all([
-                    axios.get("http://localhost:5000/api/faculties"),
-                    axios.get("http://localhost:5000/api/programs"),
-                    axios.get("http://localhost:5000/api/statuses"),
+                    axios.get("http://localhost:5002/api/faculties"),
+                    axios.get("http://localhost:5002/api/programs"),
+                    axios.get("http://localhost:5002/api/statuses"),
                 ]);
 
                 setFaculties(facultiesRes.data);
