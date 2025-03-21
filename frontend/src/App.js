@@ -129,10 +129,191 @@ const App = () => {
         }
     };
 
-    const handleImport = () => {
-
-    }
-
+    
+    const handleImport = async (event) => {
+        const file = event.target.files[0];
+        if (!file) {
+            alert("Vui lòng chọn một file để import.");
+            return;
+        }
+    
+        if (!file.name.endsWith('.xlsx')) {
+            alert("Vui lòng chọn file Excel (.xlsx).");
+            return;
+        }
+    
+        const reader = new FileReader();
+        reader.onload = async (e) => {
+            const data = e.target.result;
+            const workbook = XLSX.read(data, { type: 'binary' });
+    
+            // Assuming the first sheet is the one to import
+            const sheetName = workbook.SheetNames[0];
+            const worksheet = workbook.Sheets[sheetName];
+    
+            // Convert sheet data to JSON
+            const rows = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+    
+            // Assuming the first row is the header
+            const headers = rows[0];
+    
+            // Map Excel column names to Mongoose schema field names
+            const fieldMapping = {
+                "MSSV": "mssv",
+                "Họ tên": "name",
+                "Ngày sinh": "dob",
+                "Giới tính": "gender",
+                "Khoa": "faculty",
+                "Khóa": "course",
+                "Chương trình": "program",
+                "Địa chỉ thường trú": "permanentAddress",
+                "Địa chỉ tạm trú": "temporaryAddress",
+                "Địa chỉ nhận thư": "mailingAddress",
+                "Giấy tờ": "identityDocument",
+                "Quốc tịch": "nationality",
+                "Email": "email",
+                "Số điện thoại": "phone",
+                "Tình trạng": "status"
+            };
+    
+            // Fetch faculties, programs, and statuses from the backend
+            let faculties, programs, statuses;
+            try {
+                const [facultiesRes, programsRes, statusesRes] = await Promise.all([
+                    axios.get("http://localhost:5002/api/faculties"),
+                    axios.get("http://localhost:5002/api/programs"),
+                    axios.get("http://localhost:5002/api/statuses"),
+                ]);
+                faculties = facultiesRes.data;
+                programs = programsRes.data;
+                statuses = statusesRes.data;
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu từ backend:", error);
+                alert("Có lỗi xảy ra khi lấy dữ liệu từ backend.");
+                return;
+            }
+    
+            const studentData = rows.slice(1).map(row => {
+                const student = {};
+                headers.forEach((header, index) => {
+                    const fieldName = fieldMapping[header.trim()]; // Map header to field name
+                    if (fieldName) {
+                        student[fieldName] = row[index] ? row[index].trim() : ''; // Handle empty cells
+                    }
+                });
+    
+                // Convert date strings to Date objects
+                if (student.dob) {
+                    student.dob = new Date(student.dob);
+                }
+    
+                // Map faculty, program, and status names to ObjectId references
+                if (student.faculty) {
+                    const faculty = faculties.find(f => f.name === student.faculty);
+                    if (!faculty) {
+                        console.error(`Không tìm thấy khoa với tên: ${student.faculty}`);
+                        return null; // Skip this student if faculty is not found
+                    }
+                    student.faculty = faculty._id; // Map to ObjectId
+                }
+                if (student.program) {
+                    const program = programs.find(p => p.name === student.program);
+                    if (!program) {
+                        console.error(`Không tìm thấy chương trình với tên: ${student.program}`);
+                        return null; // Skip this student if program is not found
+                    }
+                    student.program = program._id; // Map to ObjectId
+                }
+                if (student.status) {
+                    const status = statuses.find(s => s.name === student.status);
+                    if (!status) {
+                        console.error(`Không tìm thấy tình trạng với tên: ${student.status}`);
+                        return null; // Skip this student if status is not found
+                    }
+                    student.status = status._id; // Map to ObjectId
+                }
+    
+                // Parse address fields (if needed)
+                if (student.permanentAddress) {
+                    const addressParts = student.permanentAddress.split(', ');
+                    if (addressParts.length === 5) {
+                        const [street, ward, district, city, country] = addressParts;
+                        student.permanentAddress = { street, ward, district, city, country };
+                    } else {
+                        student.permanentAddress = { street: '', ward: '', district: '', city: '', country: '' };
+                    }
+                }
+    
+                if (student.temporaryAddress) {
+                    const addressParts = student.temporaryAddress.split(', ');
+                    if (addressParts.length === 5) {
+                        const [street, ward, district, city, country] = addressParts;
+                        student.temporaryAddress = { street, ward, district, city, country };
+                    } else {
+                        student.temporaryAddress = { street: '', ward: '', district: '', city: '', country: '' };
+                    }
+                }
+    
+                if (student.mailingAddress) {
+                    const addressParts = student.mailingAddress.split(', ');
+                    if (addressParts.length === 5) {
+                        const [street, ward, district, city, country] = addressParts;
+                        student.mailingAddress = { street, ward, district, city, country };
+                    } else {
+                        student.mailingAddress = { street: '', ward: '', district: '', city: '', country: '' };
+                    }
+                }
+    
+                // Parse identity document (if needed)
+                if (student.identityDocument) {
+                    const documentParts = student.identityDocument.split(', ');
+                    if (documentParts.length === 4) {
+                        const [type, number, issueDate, issuePlace] = documentParts;
+                        student.identityDocument = {
+                            type: type.split(': ')[1] || '',
+                            number: number.split(': ')[1] || '',
+                            issueDate: new Date(issueDate.split(': ')[1]) || new Date(),
+                            issuePlace: issuePlace.split(': ')[1] || ''
+                        };
+                    } else {
+                        // Provide default values if the identity document is invalid
+                        student.identityDocument = {
+                            type: 'CCCD', // Default type
+                            number: '000000000', // Default number
+                            issueDate: new Date(), // Default issue date
+                            issuePlace: 'VN' // Default issue place
+                        };
+                    }
+                } else {
+                    // Provide default values if identityDocument is missing
+                    student.identityDocument = {
+                        type: 'CCCD', // Default type
+                        number: '000000000', // Default number
+                        issueDate: new Date(), // Default issue date
+                        issuePlace: 'VN' // Default issue place
+                    };
+                }
+    
+                return student;
+            }).filter(student => student !== null); // Filter out skipped students
+    
+            try {
+                const response = await axios.post('http://localhost:5002/api/students/import', studentData);
+                if (response.status === 200) {
+                    alert("Import thành công!");
+                    fetchStudents(); // Refresh the student list
+                }
+            } catch (error) {
+                console.error('Error importing students:', error);
+                alert("Có lỗi xảy ra khi import dữ liệu.");
+            }
+    
+            // Reset the file input after import
+            event.target.value = "";
+        };
+    
+        reader.readAsBinaryString(file); // Read XLSX as binary
+    };
     return (
         <Container fluid className="mt-4">
             <h1 className="text-center mb-4">Quản lý sinh viên</h1>

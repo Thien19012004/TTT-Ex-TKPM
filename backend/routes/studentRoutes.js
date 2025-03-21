@@ -7,6 +7,7 @@ const {
     searchStudents,
     updateFaculty
 } = require('../controllers/studentController');
+const { importCSV } = require('../controllers/importcsvController');
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.put('/:mssv', updateStudent);
 // Xóa sinh viên
 router.delete('/:mssv', deleteStudent);
 
+router.post('/import' , importCSV);
 // Tìm kiếm sinh viên
 router.get('/search', searchStudents);
 

@@ -1,16 +1,31 @@
-import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import React, { useState, useEffect } from 'react';
+
 const StudentList = ({ students, onDelete, onEdit, onImport, onExport }) => {
-    const [exportFormat, setExportFormat] = useState('csv'); // Mặc định là CSV
-    console.log("StudentList render - students:", students);
+    const [exportFormat, setExportFormat] = useState('csv');
     const [faculties, setFaculties] = useState([]);
     const [statuses, setStatuses] = useState([]);
     const [programs, setPrograms] = useState([]);
 
-    const handleExportClick = () => {
-        onExport(students, exportFormat, faculties, statuses, programs); // Truyền định dạng vào hàm onExport
+    // Create a reference to the hidden file input
+    const fileInputRef = React.useRef(null);
+
+    // Handle the button click to trigger the file input
+    const handleImportClick = () => {
+        fileInputRef.current.click(); // Programmatically click the hidden file input
     };
 
+    // Handle the file input change
+    const handleFileChange = (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            onImport(event); // Pass the event to the parent component
+        }
+    };
+
+    const handleExportClick = () => {
+        onExport(students, exportFormat, faculties, statuses, programs);
+    };
 
     useEffect(() => {
         const fetchData = async () => {
@@ -20,8 +35,6 @@ const StudentList = ({ students, onDelete, onEdit, onImport, onExport }) => {
                     axios.get("http://localhost:5002/api/programs"),
                     axios.get("http://localhost:5002/api/statuses"),
                 ]);
-
-                //console.log(facultiesRes);
 
                 setFaculties(facultiesRes.data);
                 setStatuses(statusesRes.data);
@@ -33,7 +46,6 @@ const StudentList = ({ students, onDelete, onEdit, onImport, onExport }) => {
 
         fetchData();
     }, [students]);
-    
 
     return (
         <div className="card">
@@ -50,7 +62,18 @@ const StudentList = ({ students, onDelete, onEdit, onImport, onExport }) => {
                             <option value="csv">CSV</option>
                             <option value="excel">Excel</option>
                         </select>
-                        <button className="btn btn-primary me-2" onClick={onImport}>Import File</button>
+                        {/* Hidden file input */}
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            style={{ display: 'none' }}
+                            onChange={handleFileChange}
+                            accept=".xlsx"
+                        />
+                        {/* Import button */}
+                        <button className="btn btn-primary me-2" onClick={handleImportClick}>
+                            Import File
+                        </button>
                         <button className="btn btn-success" onClick={handleExportClick}>Export File</button>
                     </div>
                 </div>
@@ -129,6 +152,5 @@ const StudentList = ({ students, onDelete, onEdit, onImport, onExport }) => {
         </div>
     );
 };
-
 
 export default StudentList;
