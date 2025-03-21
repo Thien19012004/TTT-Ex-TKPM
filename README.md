@@ -51,6 +51,8 @@ Dự án được tổ chức thành hai thư mục chính:
     cd ../frontend
     npm install
     ```
+### Chạy Docker để khởi động logstash , kibana , elastic search
+1.  docker-compose up -d
 
 ### Chạy ứng dụng.
 1.  **Chạy backend:**
@@ -63,5 +65,5 @@ Dự án được tổ chức thành hai thư mục chính:
     ```
 
 Ứng dụng sẽ chạy tại `http://localhost:3000` 
-Server sẽ chạy tại `http://localhost:5000`
+Server sẽ chạy tại `http://localhost:5002`
 

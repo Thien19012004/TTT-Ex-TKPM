@@ -4,10 +4,13 @@ import * as XLSX from 'xlsx'; // Nhập thư viện xlsx
 import StudentForm from './components/StudentForm';
 import StudentList from './components/StudentList';
 import StudentSearch from './components/StudentSearch';
+import Sidebar from './components/Sidebar';
+import { Button, Container } from 'react-bootstrap';
 
 const App = () => {
     const [students, setStudents] = useState([]);
     const [selectedStudent, setSelectedStudent] = useState(null);
+    const [showSidebar, setShowSidebar] = useState(false);
 
     // Fetch danh sách sinh viên khi component được mount
     useEffect(() => {
@@ -17,7 +20,7 @@ const App = () => {
     // Hàm fetch danh sách sinh viên từ backend
     const fetchStudents = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/students');
+            const response = await axios.get('http://localhost:5002/api/students');
             setStudents(response.data);
         } catch (error) {
             console.error('Error fetching students:', error);
@@ -38,7 +41,7 @@ const App = () => {
     // Hàm xử lý xóa sinh viên
     const handleDeleteStudent = async (mssv) => {
         try {
-            await axios.delete(`http://localhost:5000/api/students/${mssv}`);
+            await axios.delete(`http://localhost:5002/api/students/${mssv}`);
             setStudents(students.filter(student => student.mssv !== mssv));
         } catch (error) {
             console.error('Error deleting student:', error);
@@ -48,7 +51,7 @@ const App = () => {
     // Hàm xử lý tìm kiếm sinh viên
     const handleSearch = async (query, faculty) => {
         try {
-            const response = await axios.get('http://localhost:5000/api/students/search', {
+            const response = await axios.get('http://localhost:5002/api/students/search', {
                 params: {
                     q: query, // Từ khóa tìm kiếm (tên hoặc MSSV)
                     faculty: faculty // Khoa được chọn
@@ -116,8 +119,12 @@ const App = () => {
     }
 
     return (
-        <div className="container mt-4">
+        <Container fluid className="mt-4">
             <h1 className="text-center mb-4">Quản lý sinh viên</h1>
+            <Button variant="primary" onClick={() => setShowSidebar(true)}>
+                Mở Sidebar
+            </Button>
+            <Sidebar show={showSidebar} handleClose={() => setShowSidebar(false)} />
             <StudentForm
                 onAddStudent={handleAddStudent}
                 onUpdateStudent={handleUpdateStudent}
@@ -131,7 +138,7 @@ const App = () => {
                 onImport={handleImport}
                 onExport={handleExport}
             />
-        </div>
+        </Container>
     );
 };
 

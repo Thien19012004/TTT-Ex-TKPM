@@ -1,12 +1,41 @@
-import { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import React from 'react';
-
+import axios from 'axios';
 const StudentList = ({ students, onDelete, onEdit, onImport, onExport }) => {
     const [exportFormat, setExportFormat] = useState('csv'); // Mặc định là CSV
 
     const handleExportClick = () => {
         onExport(students, exportFormat); // Truyền định dạng vào hàm onExport
     };
+
+
+    console.log("StudentList render - students:", students);
+    const [faculties, setFaculties] = useState([]);
+    const [statuses, setStatuses] = useState([]);
+    const [programs, setPrograms] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const [facultiesRes, programsRes, statusesRes] = await Promise.all([
+                    axios.get("http://localhost:5000/api/faculties"),
+                    axios.get("http://localhost:5000/api/programs"),
+                    axios.get("http://localhost:5000/api/statuses"),
+                ]);
+
+                console.log(facultiesRes);
+
+                setFaculties(facultiesRes.data);
+                setStatuses(statusesRes.data);
+                setPrograms(programsRes.data);
+            } catch (error) {
+                console.error("Lỗi khi lấy dữ liệu:", error);
+            }
+        };
+
+        fetchData();
+    }, [students]);
+    
 
     return (
         <div className="card">
@@ -55,9 +84,9 @@ const StudentList = ({ students, onDelete, onEdit, onImport, onExport }) => {
                                 <td>{student.name}</td>
                                 <td>{new Date(student.dob).toLocaleDateString()}</td>
                                 <td>{student.gender}</td>
-                                <td>{student.faculty}</td>
+                                <td>{faculties.find(faculty => faculty._id === student.faculty)?.name || "Không xác định"}</td>
                                 <td>{student.course}</td>
-                                <td>{student.program}</td>
+                                <td>{programs.find(program => program._id === student.program)?.name || "Không xác định"}</td>
                                 <td>
                                     {student.permanentAddress.street}, {student.permanentAddress.ward}, {student.permanentAddress.district}, {student.permanentAddress.city}, {student.permanentAddress.country}
                                 </td>
@@ -79,7 +108,7 @@ const StudentList = ({ students, onDelete, onEdit, onImport, onExport }) => {
                                 <td>{student.nationality}</td>
                                 <td>{student.email}</td>
                                 <td>{student.phone}</td>
-                                <td>{student.status}</td>
+                                <td>{statuses.find(status => status._id === student.status)?.name || "Không xác định"}</td>
                                 <td>
                                     <button
                                         className="btn btn-warning btn-sm me-2"

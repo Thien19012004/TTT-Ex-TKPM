@@ -5,44 +5,44 @@ const studentSchema = new mongoose.Schema({
     name: { type: String, required: true },
     dob: { type: Date, required: true },
     gender: { type: String, enum: ['Nam', 'Nữ'], required: true },
-    faculty: { type: String, required: true },
+    faculty: { type: mongoose.Schema.Types.ObjectId, ref: 'Faculty', required: true }, // Tham chiếu bảng Faculty
     course: { type: String, required: true },
-    program: { type: String, required: true },
-    permanentAddress: { // Địa chỉ thường trú
-        street: String, // Số nhà, Tên đường
-        ward: String,   // Phường/Xã
-        district: String, // Quận/Huyện
-        city: String,   // Tỉnh/Thành phố
-        country: String // Quốc gia
-    },
-    temporaryAddress: { // Địa chỉ tạm trú
+    program: { type: mongoose.Schema.Types.ObjectId, ref: 'Program', required: true }, // Tham chiếu bảng Program
+    permanentAddress: {
         street: String,
         ward: String,
         district: String,
         city: String,
         country: String
     },
-    mailingAddress: { // Địa chỉ nhận thư
+    temporaryAddress: {
         street: String,
         ward: String,
         district: String,
         city: String,
         country: String
     },
-    identityDocument: { // Giấy tờ chứng minh nhân thân
+    mailingAddress: {
+        street: String,
+        ward: String,
+        district: String,
+        city: String,
+        country: String
+    },
+    identityDocument: {
         type: { type: String, enum: ['CMND', 'CCCD', 'Passport'], required: true },
-        number: { type: String, required: true }, // Số CMND/CCCD/Hộ chiếu
-        issueDate: { type: Date, required: true }, // Ngày cấp
-        issuePlace: { type: String, required: true }, // Nơi cấp
-        expiryDate: { type: Date }, // Ngày hết hạn
-        hasChip: { type: Boolean }, // Có gắn chip hay không (chỉ dành cho CCCD)
-        issueCountry: { type: String }, // Quốc gia cấp (chỉ dành cho hộ chiếu)
-        notes: { type: String } // Ghi chú (chỉ dành cho hộ chiếu)
+        number: { type: String, required: true },
+        issueDate: { type: Date, required: true },
+        issuePlace: { type: String, required: true },
+        expiryDate: { type: Date },
+        hasChip: { type: Boolean },
+        issueCountry: { type: String },
+        notes: { type: String }
     },
-    nationality: { type: String, required: true }, // Quốc tịch
+    nationality: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     phone: { type: String, required: true },
-    status: { type: String, enum: ['Đang học', 'Đã tốt nghiệp', 'Đã thôi học', 'Tạm dừng học'], required: true }
+    status: { type: mongoose.Schema.Types.ObjectId, ref: 'Status', required: true } // Tham chiếu bảng Status
 });
 
 module.exports = mongoose.model('Student', studentSchema);
