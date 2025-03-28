@@ -1,7 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import ValidationConfigForm from './ValidationConfigForm';
 
 const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
+    // Configuration for validation rules
+    const [showConfig, setShowConfig] = useState(false);
+
+// Replace the hardcoded validationConfig with this:
+    const [validationConfig, setValidationConfig] = useState(() => {
+    const savedConfig = localStorage.getItem('validationConfig');
+    return savedConfig ? JSON.parse(savedConfig) : {
+        emailDomain: '@student.university.edu.vn',
+        phonePatterns: {
+            phonePatterns: /^(?:\+84|0)([3|5|7|8|9])([0-9]{8})$/
+        },
+        statusTransitions: {
+            'Đang học': ['Bảo lưu', 'Tốt nghiệp', 'Đình chỉ'],
+            'Bảo lưu': ['Đang học', 'Thôi học'],
+            'Đình chỉ': ['Đang học', 'Thôi học'],
+            'Tốt nghiệp': []
+            }
+        };
+    });
+
     const [student, setStudent] = useState({
         mssv: '',
         name: '',
@@ -29,15 +50,20 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
         status: ''
     });
 
-    const [errors, setErrors] = useState({}); // State để lưu thông báo lỗi
-
+    const [errors, setErrors] = useState({});
     const [faculties, setFaculties] = useState([]);
     const [programs, setPrograms] = useState([]);
     const [statuses, setStatuses] = useState([]);
+    const [currentStatusName, setCurrentStatusName] = useState('');
 
     useEffect(() => {
         if (selectedStudent) {
             setStudent(selectedStudent);
+            // Find and set current status name when data is loaded
+            if (statuses.length > 0) {
+                const currentStatus = statuses.find(s => s._id === selectedStudent.status);
+                if (currentStatus) setCurrentStatusName(currentStatus.name);
+            }
         }
 
         const fetchData = async () => {
@@ -51,6 +77,12 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                 setFaculties(facultiesRes.data);
                 setPrograms(programsRes.data);
                 setStatuses(statusesRes.data);
+
+                // Set current status name after statuses are loaded
+                if (selectedStudent) {
+                    const currentStatus = statusesRes.data.find(s => s._id === selectedStudent.status);
+                    if (currentStatus) setCurrentStatusName(currentStatus.name);
+                }
             } catch (error) {
                 console.error("Lỗi khi lấy dữ liệu:", error);
             }
@@ -59,30 +91,46 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
         fetchData();
     }, [selectedStudent]);
 
-    // Hàm kiểm tra tính hợp lệ
     const validateForm = () => {
         const newErrors = {};
-
-        // Kiểm tra email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!student.email || !emailRegex.test(student.email)) {
-            newErrors.email = 'Email không hợp lệ';
+    
+        // Email validation
+        if (!student.email || !student.email.endsWith(validationConfig.emailDomain)) {
+            newErrors.email = `Email phải thuộc tên miền ${validationConfig.emailDomain}`;
         }
-
-        // Kiểm tra số điện thoại
-        const phoneRegex = /^0\d{9}$/;
-        if (!student.phone || !phoneRegex.test(student.phone)) {
-            newErrors.phone = 'Số điện thoại phải gồm 10 chữ số và bắt đầu bằng số 0';
+    
+        // Phone validation - convert string pattern to RegExp if needed
+        const phonePattern = typeof validationConfig.phonePatterns.phonePatterns === 'string' ? 
+            new RegExp(validationConfig.phonePatterns.phonePatterns) : 
+            validationConfig.phonePatterns.phonePatterns;
+        
+        if (!student.phone || !phonePattern.test(student.phone)) {
+            newErrors.phone = 'Số điện thoại phải có định dạng +84 hoặc 0 theo sau bởi 3/5/7/8/9 và 8 chữ số';
         }
-
+    
+        // Status transition validation
+        if (selectedStudent && student.status) {
+            const newStatus = statuses.find(s => s._id === student.status);
+            if (newStatus && currentStatusName) {
+                const allowedTransitions = validationConfig.statusTransitions[currentStatusName] || [];
+                if (!allowedTransitions.includes(newStatus.name)) {
+                    newErrors.status = `Không thể chuyển từ "${currentStatusName}" sang "${newStatus.name}"`;
+                }
+            }
+        }
+    
         setErrors(newErrors);
-        return Object.keys(newErrors).length === 0; // Trả về true nếu không có lỗi
+        return Object.keys(newErrors).length === 0;
     };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
     
-        // Nếu chọn từ danh sách (faculty, status, program), tìm _id tương ứng
+        if (name === "status") {
+            const newStatus = statuses.find(s => s._id === value);
+            if (newStatus) setCurrentStatusName(newStatus.name);
+        }
+    
         let selectedId = value;
     
         if (name === "faculty") {
@@ -95,12 +143,10 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
     
         setStudent({ ...student, [name]: selectedId });
     
-        // Xóa thông báo lỗi khi người dùng nhập lại
         if (errors[name]) {
             setErrors({ ...errors, [name]: "" });
         }
     };
-    
 
     const handleAddressChange = (type, field, value) => {
         setStudent({
@@ -119,10 +165,7 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Kiểm tra tính hợp lệ trước khi gửi dữ liệu
-        if (!validateForm()) {
-            return; // Dừng lại nếu có lỗi
-        }
+        if (!validateForm()) return;
 
         try {
             if (selectedStudent) {
@@ -132,6 +175,7 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                 await axios.post('http://localhost:5002/api/students', student);
                 onAddStudent(student);
             }
+            // Reset form
             setStudent({
                 mssv: '',
                 name: '',
@@ -158,7 +202,8 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                 phone: '',
                 status: ''
             });
-            setErrors({}); // Xóa thông báo lỗi sau khi gửi thành công
+            setErrors({});
+            setCurrentStatusName('');
         } catch (error) {
             console.error('Error saving student:', error);
         }
@@ -170,7 +215,7 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                 <h5 className="card-title">{selectedStudent ? 'Cập nhật sinh viên' : 'Thêm sinh viên mới'}</h5>
                 <form onSubmit={handleSubmit}>
                     <div className="row">
-                        {/* Cột 1 */}
+                        {/* Column 1 */}
                         <div className="col-md-6">
                             <div className="mb-3">
                                 <label className="form-label">MSSV</label>
@@ -325,9 +370,9 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                             </div>
                         </div>
 
-                        {/* Cột 2 */}
+                        {/* Column 2 */}
                         <div className="col-md-6">
-                            {/* Địa chỉ tạm trú */}
+                            {/* Temporary Address */}
                             <div className="row">
                                 <div className="col-md-6">
                                     <h6>Địa chỉ tạm trú</h6>
@@ -369,7 +414,7 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                                 </div>
                             </div>
 
-                            {/* Địa chỉ nhận thư */}
+                            {/* Mailing Address */}
                             <div className="row">
                                 <div className="col-md-6">
                                     <h6>Địa chỉ nhận thư</h6>
@@ -411,7 +456,7 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                                 </div>
                             </div>
 
-                            {/* Giấy tờ chứng minh nhân thân */}
+                            {/* Identity Document */}
                             <div className="row">
                                 <div className="col-md-6">
                                     <h6>Giấy tờ chứng minh nhân thân</h6>
@@ -490,20 +535,37 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                                     type="email"
                                     className={`form-control ${errors.email ? 'is-invalid' : ''}`}
                                     name="email"
-                                    placeholder="Email"
+                                    placeholder={`Email (phải kết thúc bằng ${validationConfig.emailDomain})`}
                                     value={student.email}
                                     onChange={handleChange}
                                     required
                                 />
                                 {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                             </div>
+                            <button 
+                                    className="btn btn-sm btn-outline-secondary float-end" 
+                                    onClick={() => setShowConfig(true)} 
+                                    >
+                                    Cấu hình validation
+                            </button>
+                            {showConfig && (
+                            <ValidationConfigForm 
+                                onClose={() => {
+                                const savedConfig = localStorage.getItem('validationConfig');
+                                if (savedConfig) {
+                                    setValidationConfig(JSON.parse(savedConfig));
+                                }
+                                setShowConfig(false);
+                                }} 
+                                />
+                            )}
                             <div className="mb-3">
                                 <label className="form-label">Số điện thoại</label>
                                 <input
                                     type="tel"
                                     className={`form-control ${errors.phone ? 'is-invalid' : ''}`}
                                     name="phone"
-                                    placeholder="Số điện thoại"
+                                    placeholder="Số điện thoại (0 hoặc +84 theo sau bởi 3/5/7/8/9 và 8 số)"
                                     value={student.phone}
                                     onChange={handleChange}
                                     required
@@ -513,7 +575,7 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                             <div className="mb-3">
                                 <label className="form-label">Trạng thái</label>
                                 <select
-                                    className="form-select"
+                                    className={`form-select ${errors.status ? 'is-invalid' : ''}`}
                                     name="status"
                                     value={student.status}
                                     onChange={handleChange}
@@ -526,11 +588,11 @@ const StudentForm = ({ onAddStudent, onUpdateStudent, selectedStudent }) => {
                                         </option>
                                     ))}
                                 </select>
+                                {errors.status && <div className="invalid-feedback">{errors.status}</div>}
                             </div>
                         </div>
                     </div>
 
-                    {/* Nút submit */}
                     <div className="text-center mt-4">
                         <button type="submit" className="btn btn-primary">
                             {selectedStudent ? 'Cập nhật' : 'Thêm sinh viên'}
